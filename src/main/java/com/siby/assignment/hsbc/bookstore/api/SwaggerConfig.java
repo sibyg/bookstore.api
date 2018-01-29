@@ -1,4 +1,4 @@
-package com.siby.assignment.hsbc.bookstore.api.config;
+package com.siby.assignment.hsbc.bookstore.api;
 
 import java.util.Collections;
 

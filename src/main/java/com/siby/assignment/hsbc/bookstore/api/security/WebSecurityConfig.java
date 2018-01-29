@@ -1,4 +1,4 @@
-package com.siby.assignment.hsbc.bookstore.api.config;
+package com.siby.assignment.hsbc.bookstore.api.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
