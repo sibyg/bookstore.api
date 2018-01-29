@@ -3,6 +3,7 @@ package com.siby.assignment.hsbc.bookstore.api.rest;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,6 +16,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.Filter;
 
 import com.siby.assignment.hsbc.bookstore.api.Application;
 import com.siby.assignment.hsbc.bookstore.api.domain.Book;
@@ -40,6 +43,10 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 public class BookRestControllerAcceptanceTest {
 
+
+    private static final String USERNAME = "test";
+    private static final String PASSWORD = "test";
+    private static final String ROLE = "USER";
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -76,9 +83,14 @@ public class BookRestControllerAcceptanceTest {
                 this.mappingJackson2HttpMessageConverter);
     }
 
+    @Autowired
+    private Filter springSecurityFilterChain;
+
     @Before
     public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .build();
 
         this.bookRepository.deleteAllInBatch();
         this.bookstoreRepository.deleteAllInBatch();
@@ -90,15 +102,15 @@ public class BookRestControllerAcceptanceTest {
 
     @Test
     public void bookstoreNotFound() throws Exception {
-        mockMvc.perform(post("/george/bookmarks/")
-                .content(this.json(new Book()))
-                .contentType(contentType))
+        mockMvc.perform(get("/unknown/books")
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void readBooks() throws Exception {
-        mockMvc.perform(get("/" + bookstoreName + "/books"))
+        mockMvc.perform(get("/" + bookstoreName + "/books")
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -112,8 +124,8 @@ public class BookRestControllerAcceptanceTest {
 
     @Test
     public void readSingleBook() throws Exception {
-        mockMvc.perform(get("/" + bookstoreName + "/books/"
-                + this.bookList.get(0).getId()))
+        mockMvc.perform(get("/" + bookstoreName + "/books/" + this.bookList.get(0).getId())
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.id", is(this.bookList.get(0).getId().intValue())))
@@ -128,7 +140,8 @@ public class BookRestControllerAcceptanceTest {
 
         this.mockMvc.perform(post("/" + bookstoreName + "/books")
                 .contentType(contentType)
-                .content(bookJson))
+                .content(bookJson)
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isCreated());
     }
 
