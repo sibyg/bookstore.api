@@ -1,2 +1,2 @@
 # bookstore.api
-sample rest level 3 api for a bookstore using spring
+sample rest level 3 (HATEOS) api for a bookstore using spring
