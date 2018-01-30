@@ -2,10 +2,6 @@
 sample rest level 3 (HATEOS) api for a bookstore using spring
 
 
-# Resources
-- [REST With Spring] (http://bit.ly/restwithspring)
-
-
 # Quick Start
 ```
 git clone https://github.com/sibyg/bookstore.api
