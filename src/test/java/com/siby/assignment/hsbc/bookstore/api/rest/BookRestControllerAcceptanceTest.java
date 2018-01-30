@@ -113,13 +113,16 @@ public class BookRestControllerAcceptanceTest {
                 .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(this.bookList.get(0).getId().intValue())))
-                .andExpect(jsonPath("$[0].author", is("http://books/1/" + bookstoreName)))
-                .andExpect(jsonPath("$[0].title", is("A title")))
-                .andExpect(jsonPath("$[1].id", is(this.bookList.get(1).getId().intValue())))
-                .andExpect(jsonPath("$[1].author", is("http://books/2/" + bookstoreName)))
-                .andExpect(jsonPath("$[1].title", is("A title")));
+                .andExpect(jsonPath("$._embedded.bookResourceList[0].book.id", is(this.bookList.get(0).getId().intValue())))
+                .andExpect(jsonPath("$._embedded.bookResourceList[0].book.author", is("http://books/1/" + bookstoreName)))
+                .andExpect(jsonPath("$._embedded.bookResourceList[0].book.title", is("A title")))
+                .andExpect(jsonPath("$._embedded.bookResourceList[0]._links.books.href", is("http://localhost/enfield/books")))
+                .andExpect(jsonPath("$._embedded.bookResourceList[0]._links.self.href", is("http://localhost/enfield/books/1")))
+                .andExpect(jsonPath("$._embedded.bookResourceList[1].book.id", is(this.bookList.get(1).getId().intValue())))
+                .andExpect(jsonPath("$._embedded.bookResourceList[1].book.author", is("http://books/2/" + bookstoreName)))
+                .andExpect(jsonPath("$._embedded.bookResourceList[1].book.title", is("A title")))
+                .andExpect(jsonPath("$._embedded.bookResourceList[1]._links.books.href", is("http://localhost/enfield/books")))
+                .andExpect(jsonPath("$._embedded.bookResourceList[1]._links.self.href", is("http://localhost/enfield/books/2")));
     }
 
     @Test
@@ -128,9 +131,11 @@ public class BookRestControllerAcceptanceTest {
                 .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.id", is(this.bookList.get(0).getId().intValue())))
-                .andExpect(jsonPath("$.author", is("http://books/1/" + bookstoreName)))
-                .andExpect(jsonPath("$.title", is("A title")));
+                .andExpect(jsonPath("$.book.id", is(this.bookList.get(0).getId().intValue())))
+                .andExpect(jsonPath("$.book.author", is("http://books/1/" + bookstoreName)))
+                .andExpect(jsonPath("$.book.title", is("A title")))
+                .andExpect(jsonPath("$._links.books.href", is("http://localhost/enfield/books")))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/enfield/books/8")));
     }
 
     @Test
