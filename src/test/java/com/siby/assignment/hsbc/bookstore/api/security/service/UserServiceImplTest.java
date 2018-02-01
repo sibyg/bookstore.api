@@ -5,22 +5,31 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import java.util.Collections;
 import java.util.Random;
 
+import com.siby.assignment.hsbc.bookstore.api.security.model.Role;
 import com.siby.assignment.hsbc.bookstore.api.security.model.User;
 import com.siby.assignment.hsbc.bookstore.api.security.repository.UserRepository;
 import com.siby.assignment.hsbc.bookstore.api.security.web.dto.UserRegistrationDto;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -34,7 +43,27 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldfindByEmail() {
+    public void shouldSaveUser() {
+        // given
+        UserRegistrationDto registration = randomUserRegistrationDto();
+
+        // when
+        userService.save(registration);
+
+        // then
+        verify(passwordEncoder).encode(registration.getPassword());
+        // and
+        ArgumentCaptor<User> argument = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(argument.capture());
+        User actualUser = argument.getValue();
+        assertThat(actualUser.getFirstName(), is(registration.getFirstName()));
+        assertThat(actualUser.getLastName(), is(registration.getLastName()));
+        assertThat(actualUser.getEmail(), is(registration.getEmail()));
+
+    }
+
+    @Test
+    public void shouldFindByEmail() {
         // given
         String email = "test@gmail.com";
         // and
@@ -50,15 +79,46 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldSaveUser() {
-        UserRegistrationDto registration = randomUserRegistrationDto();
-        userService.save(registration);
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        User capture = captor.capture();
-        verify(userRepository).save(capture);
-        assertThat(capture.getFirstName(), is(registration.getFirstName()));
-        assertThat(capture.getLastName(), is(registration.getLastName()));
-        assertThat(capture.getEmail(), is(registration.getEmail()));
+    public void shouldThrowUsernameNotFoundException() {
+        // given
+        String email = randomString();
+        // and
+        given(userRepository.findByEmail(email)).willReturn(null);
+        // and
+        thrown.expect(UsernameNotFoundException.class);
+
+        // when
+        userService.loadUserByUsername(email);
+    }
+
+    @Test
+    public void shouldLoadUserByEmail() {
+        // given
+        String email = randomString();
+        // and
+        User user = randomUser();
+        given(userRepository.findByEmail(email)).willReturn(user);
+
+        // when
+        UserDetails userDetails = userService.loadUserByUsername(email);
+
+        // then
+        assertThat(userDetails.getUsername(), is(user.getEmail()));
+        // and
+        assertThat(userDetails.getPassword(), is(user.getPassword()));
+    }
+
+    private User randomUser() {
+        User user = new User();
+        String firstName = randomString();
+        user.setFirstName(firstName);
+        String lastName = randomString();
+        user.setLastName(lastName);
+        String email = randomString();
+        user.setEmail(email);
+        user.setPassword(randomString());
+        user.setRoles(Collections.singletonList(new Role("USER")));
+        return user;
     }
 
     private UserRegistrationDto randomUserRegistrationDto() {

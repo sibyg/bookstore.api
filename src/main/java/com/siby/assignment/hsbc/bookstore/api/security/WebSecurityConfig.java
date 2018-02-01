@@ -20,18 +20,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests()
+                .antMatchers("/bookstore/api/registration").permitAll()
+                .antMatchers("/bookstore/api/swagger-ui**").permitAll()
+                .antMatchers("/bookstore/api/healthcheck**").permitAll()
+                .antMatchers("/bookstore/api/static/**").permitAll()
+                .antMatchers("/bookstore/api/admin/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/bookstore/api/**").authenticated();
         http.csrf().disable();
         http.httpBasic();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("test")
-                .password("test")
-                .roles("USER");
+        auth.userDetailsService(userService);
     }
 
     @Bean
