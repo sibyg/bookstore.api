@@ -1,13 +1,9 @@
-package com.siby.assignment.hsbc.bookstore.api.repository;
+package com.siby.assignment.hsbc.bookstore.api.security.repository;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Collection;
-
-import com.siby.assignment.hsbc.bookstore.api.domain.Book;
-import com.siby.assignment.hsbc.bookstore.api.domain.Bookstore;
-import com.siby.assignment.hsbc.bookstore.api.repository.dto.UserDto;
+import com.siby.assignment.hsbc.bookstore.api.security.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +24,13 @@ public class UserRepositoryTest {
     @Test
     public void shouldFindUserByEmail() throws Exception {
         // given
-        UserDto user  = new UserDto();
+        String email = "test@gmail.com";
+        this.entityManager.persist(new User("firstname", "lastname", email, "password"));
+
+        // when
+        User actualUser = this.repository.findByEmail(email);
+
+        // then
+        assertThat(actualUser.getEmail(), is(email));
     }
 }
