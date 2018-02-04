@@ -1,6 +1,5 @@
 package com.siby.assignment.hsbc.bookstore.api.rest;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import javax.servlet.Filter;
 
-import com.siby.assignment.hsbc.bookstore.api.Application;
 import com.siby.assignment.hsbc.bookstore.api.domain.Book;
 import com.siby.assignment.hsbc.bookstore.api.domain.Bookstore;
 import com.siby.assignment.hsbc.bookstore.api.repository.BookRepository;
@@ -28,20 +26,27 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
+@ActiveProfiles("it")
+@AutoConfigureMockMvc
+@RunWith(SpringJUnit4ClassRunner.class)
+
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-public class BookRestControllerAcceptanceTest {
+public class BookstoreIT {
 
 
     private static final String USERNAME = "test";
@@ -95,7 +100,7 @@ public class BookRestControllerAcceptanceTest {
         this.bookRepository.deleteAllInBatch();
         this.bookstoreRepository.deleteAllInBatch();
 
-        this.bookstore = bookstoreRepository.save(new Bookstore(bookstoreName, "password"));
+        this.bookstore = bookstoreRepository.save(new Bookstore(bookstoreName));
         this.bookList.add(bookRepository.save(new Book(bookstore, "http://books/1/" + bookstoreName, "A title")));
         this.bookList.add(bookRepository.save(new Book(bookstore, "http://books/2/" + bookstoreName, "A title")));
     }

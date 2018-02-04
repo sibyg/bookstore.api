@@ -9,8 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
 public class Bookstore {
@@ -30,21 +28,14 @@ public class Bookstore {
         return id;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getName() {
         return name;
     }
 
-    @JsonIgnore
-    public String password;
     public String name;
 
-    public Bookstore(String name, String password) {
+    public Bookstore(String name) {
         this.name = name;
-        this.password = password;
     }
 
     Bookstore() { // jpa only

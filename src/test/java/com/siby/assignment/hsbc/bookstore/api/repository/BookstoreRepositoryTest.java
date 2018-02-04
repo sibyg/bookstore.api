@@ -29,7 +29,7 @@ public class BookstoreRepositoryTest {
     public void shouldFindBookstoreByName() throws Exception {
         // given
         String bookstoreName = "test123";
-        this.entityManager.persist(new Bookstore(bookstoreName, "enfield"));
+        this.entityManager.persist(new Bookstore(bookstoreName));
 
         // when
         Optional<Bookstore> bookstoreOptional = this.repository.findByName(bookstoreName);

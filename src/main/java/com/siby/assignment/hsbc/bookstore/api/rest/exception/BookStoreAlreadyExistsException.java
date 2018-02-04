@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class BookStoreNotFoundException extends RuntimeException {
+public class BookStoreAlreadyExistsException extends RuntimeException {
 
-    public BookStoreNotFoundException(String bookstoreName) {
-        super("could not find book store: '" + bookstoreName + "'.");
+    public BookStoreAlreadyExistsException(String bookstoreName) {
+        super("Book store already exists: '" + bookstoreName + "'.");
     }
 }

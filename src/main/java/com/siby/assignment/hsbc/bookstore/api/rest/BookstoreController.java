@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.stream.Collectors;
 
 import com.siby.assignment.hsbc.bookstore.api.domain.Book;
+import com.siby.assignment.hsbc.bookstore.api.domain.Bookstore;
 import com.siby.assignment.hsbc.bookstore.api.repository.BookRepository;
 import com.siby.assignment.hsbc.bookstore.api.repository.BookstoreRepository;
+import com.siby.assignment.hsbc.bookstore.api.rest.exception.BookStoreAlreadyExistsException;
 import com.siby.assignment.hsbc.bookstore.api.rest.exception.BookStoreNotFoundException;
 import com.siby.assignment.hsbc.bookstore.api.rest.resource.BookResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,38 +22,52 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/{bookstoreName}/books")
-public class BookstoreRestController {
+@RequestMapping("/{bookstoreName}")
+public class BookstoreController {
 
     private final BookRepository bookRepository;
 
     private final BookstoreRepository bookstoreRepository;
 
     @Autowired
-    BookstoreRestController(BookRepository bookRepository,
-                            BookstoreRepository bookstoreRepository) {
+    BookstoreController(BookRepository bookRepository,
+                        BookstoreRepository bookstoreRepository) {
         this.bookRepository = bookRepository;
         this.bookstoreRepository = bookstoreRepository;
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    @RequestMapping(path = "/books", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     public Resources<BookResource> readBooks(@PathVariable String bookstoreName) {
-        this.validateBookstore(bookstoreName);
-        return new Resources<>(this.bookRepository.findByBookstoreName(bookstoreName).stream().map(BookResource::new).collect(Collectors.toList()));
+        validateBookstore(bookstoreName);
+        return new Resources<>(bookRepository.findByBookstoreName(bookstoreName).stream().map(BookResource::new).collect(Collectors.toList()));
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{bookId}", produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    @RequestMapping(path = "/books/{bookId}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     public BookResource readBook(@PathVariable String bookstoreName, @PathVariable Long bookId) {
-        this.validateBookstore(bookstoreName);
-        return new BookResource(this.bookRepository.findOne(bookId));
+        validateBookstore(bookstoreName);
+        return new BookResource(bookRepository.findOne(bookId));
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> add(@PathVariable String bookstoreName, @RequestBody Book book) {
-        this.validateBookstore(bookstoreName);
+    @RequestMapping(path = "/register", method = RequestMethod.POST)
+    public ResponseEntity<?> registerBookstore(@PathVariable String bookstoreName) {
 
-        return this.bookstoreRepository
+        if (bookstoreRepository.findByName(bookstoreName).isPresent()) {
+            throw new BookStoreAlreadyExistsException(bookstoreName);
+        }
+
+        bookstoreRepository.save(new Bookstore(bookstoreName));
+
+        URI location = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString().replaceAll("register", "books"));
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @RequestMapping(path = "/books", method = RequestMethod.POST)
+    public ResponseEntity<?> add(@PathVariable String bookstoreName, @RequestBody Book book) {
+        validateBookstore(bookstoreName);
+
+        return bookstoreRepository
                 .findByName(bookstoreName)
                 .map(bookstore -> {
                     Book result = bookRepository.save(new Book(bookstore,
@@ -67,8 +83,8 @@ public class BookstoreRestController {
 
     }
 
-    void validateBookstore(String name) {
-        this.bookstoreRepository.findByName(name).orElseThrow(
+    private void validateBookstore(String name) {
+        bookstoreRepository.findByName(name).orElseThrow(
                 () -> new BookStoreNotFoundException(name));
     }
 }

@@ -5,7 +5,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import com.siby.assignment.hsbc.bookstore.api.domain.Book;
-import com.siby.assignment.hsbc.bookstore.api.rest.BookstoreRestController;
+import com.siby.assignment.hsbc.bookstore.api.rest.BookstoreController;
 import org.springframework.hateoas.ResourceSupport;
 
 public class BookResource extends ResourceSupport {
@@ -15,8 +15,8 @@ public class BookResource extends ResourceSupport {
     public BookResource(Book book) {
         String bookstoreName = book.getBookstore().getName();
         this.book = book;
-        this.add(linkTo(BookstoreRestController.class, bookstoreName).withRel("books"));
-        this.add(linkTo(methodOn(BookstoreRestController.class, bookstoreName)
+        this.add(linkTo(BookstoreController.class, bookstoreName).withRel("books"));
+        this.add(linkTo(methodOn(BookstoreController.class, bookstoreName)
                 .readBook(bookstoreName, book.getId())).withSelfRel());
     }
 

@@ -28,7 +28,7 @@ public class BookRepositoryTest {
     public void shouldFindBooksByBookstoreName() throws Exception {
         // given
         String bookstoreName = "test1234";
-        Bookstore bookstore = new Bookstore(bookstoreName, "password");
+        Bookstore bookstore = new Bookstore(bookstoreName);
         this.entityManager.persist(bookstore);
         this.entityManager.persist(new Book(bookstore, "author", "title"));
 
