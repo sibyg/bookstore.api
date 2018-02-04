@@ -25,3 +25,30 @@ The project uses the following technologies: <br/>
 
 # IntelliJ
 - see the [IntelliJ for Spring page](https://www.jetbrains.com/help/idea/spring.html)
+
+# Running Locally,
+Swagger UI
+http://localhost:8080/bookstore/api/swagger-ui.html
+
+To add a bookstore `enfield`:
+http://localhost:8080/bookstore/api/enfield/register
+
+To add a book to `enfield` bookstore:
+HTTP POST to http://localhost:8080/bookstore/api/enfield/books
+with JSON body
+{
+        "id": 1,
+        "author": "author/1/enfield",
+        "title": "A description"
+}
+
+To read all books from `enfield` bookstore:
+ http://localhost:8080/bookstore/api/swagger-ui.html
+
+ # Test
+ Integration tests:
+ `**IT`
+ Repository tests are
+ `**RepositoryTest`
+ Unit tests:
+`**Test`
