@@ -21,12 +21,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/bookstore/api/registration").permitAll()
-                .antMatchers("/bookstore/api/swagger-ui**").permitAll()
-                .antMatchers("/bookstore/api/healthcheck**").permitAll()
-                .antMatchers("/bookstore/api/static/**").permitAll()
-                .antMatchers("/bookstore/api/admin/**").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/bookstore/api/**").authenticated();
+                .antMatchers(
+                        "/registration",
+                        "/js/**",
+                        "/css/**",
+                        "/img/**",
+                        "/webjars/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/configuration/ui",
+                        "/configuration/security").permitAll()
+                .anyRequest().authenticated();
         http.csrf().disable();
         http.httpBasic();
     }

@@ -26,6 +26,8 @@
         <commons-lang3.version>3.7</commons-lang3.version>
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <bootstrap.version>3.3.7</bootstrap.version>
+        <jquery.version>3.2.1</jquery.version>
     </properties>
 
     <dependencies>
@@ -72,6 +74,27 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+        </dependency>
+
+        <!-- bootstrap and jquery -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>${jquery.version}</version>
         </dependency>
 
         <dependency>
