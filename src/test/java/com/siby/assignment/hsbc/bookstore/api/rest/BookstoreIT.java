@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -22,6 +23,7 @@ import com.siby.assignment.hsbc.bookstore.api.domain.Book;
 import com.siby.assignment.hsbc.bookstore.api.domain.Bookstore;
 import com.siby.assignment.hsbc.bookstore.api.repository.BookRepository;
 import com.siby.assignment.hsbc.bookstore.api.repository.BookstoreRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,9 +44,6 @@ import org.springframework.web.context.WebApplicationContext;
 @ActiveProfiles("it")
 @AutoConfigureMockMvc
 @RunWith(SpringJUnit4ClassRunner.class)
-
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 public class BookstoreIT {
 
@@ -103,6 +102,33 @@ public class BookstoreIT {
         this.bookstore = bookstoreRepository.save(new Bookstore(bookstoreName));
         this.bookList.add(bookRepository.save(new Book(bookstore, "http://books/1/" + bookstoreName, "A title")));
         this.bookList.add(bookRepository.save(new Book(bookstore, "http://books/2/" + bookstoreName, "A title")));
+    }
+
+    @Test
+    public void bookstoreAlreadyExists() throws Exception {
+        String bookstore = RandomStringUtils.randomAlphabetic(3);
+
+        this.mockMvc.perform(post("/" + bookstore + "/register")
+                .contentType(contentType)
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
+                .andExpect(header().string("location", "http://localhost/" + bookstore + "/books"))
+                .andExpect(status().isCreated());
+        // and
+        this.mockMvc.perform(post("/" + bookstore + "/register")
+                .contentType(contentType)
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void registerBookstore() throws Exception {
+        String bookstore = RandomStringUtils.randomAlphabetic(3);
+
+        this.mockMvc.perform(post("/" + bookstore + "/register")
+                .contentType(contentType)
+                .with(user(USERNAME).password(PASSWORD).roles(ROLE)))
+                .andExpect(header().string("location", "http://localhost/" + bookstore + "/books"))
+                .andExpect(status().isCreated());
     }
 
     @Test
