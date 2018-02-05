@@ -3,7 +3,7 @@ package com.siby.assignment.hsbc.bookstore.api.repository;
 
 import java.util.Collection;
 
-import com.siby.assignment.hsbc.bookstore.api.domain.Book;
+import com.siby.assignment.hsbc.bookstore.api.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
